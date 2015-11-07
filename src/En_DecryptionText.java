@@ -1,5 +1,5 @@
 /**
- * Created by lenovo on 2015/10/26.
+ * Created by hugoby on 2015/10/26.
  */
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
@@ -23,79 +23,79 @@ import java.security.KeyPairGenerator;
 public class En_DecryptionText {
     public static void main(String[] args) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, IOException
     {
-        //²âÊÔÎÄ±¾
+        //æµ‹è¯•æ–‡æœ¬
         String text = new String("Hugo majors in SoftWare Engineering in South China University of Technology.");
         System.out.println("The text before being encrypted is : " + text);
-        //ÃÜÔ¿µÄÉú³É
+        //å¯†é’¥çš„ç”Ÿæˆ
         setECCKey();
 
         BASE64Decoder decoder2 = new BASE64Decoder();
         byte[] text2 = decoder2.decodeBuffer(text);
-        //¼ÓÃÜ
+        //åŠ å¯†
         String textAfterEncrypted = encryption(text2);
         System.out.println("The text after being encrypted is : " + textAfterEncrypted);
 
         System.out.println("The text after being decrypted is : " + textAfterEncrypted);
-        //½âÃÜ
+        //è§£å¯†
         String textAfterDecrypted = decryption(textAfterEncrypted);
         System.out.println("The text after being encrypted is : " + textAfterDecrypted);
     }
 
-    //Éú³ÉÃÜÔ¿£¨¹«Ô¿ºÍË½Ô¿£©£¬²¢±£´æÔÚHashMap<String,String>keyMapÖĞ
+    //ç”Ÿæˆå¯†é’¥ï¼ˆå…¬é’¥å’Œç§é’¥ï¼‰ï¼Œå¹¶ä¿å­˜åœ¨HashMap<String,String>keyMapä¸­
     private static void setECCKey() throws NoSuchProviderException, NoSuchAlgorithmException
     {
         Security.addProvider(new BouncyCastleProvider());
-        Security.insertProviderAt(new BouncyCastleProvider(), 1);//ÏÔÊ½Ìí¼Ó°²È«Ìá¹©Õß
-        //Map<String,String>keyMap=new HashMap<String,String>();//½¨Á¢Ò»¸öÍ¼´æ´¢ÃÜÔ¿¶Ô
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("ECIES", "BC");//Ö¸Ã÷°²È«Ìá¹©Õß
-        kpg.initialize(256);//ÉèÖÃÃÜÔ¿³¤¶ÈÎª116Î»
-        KeyPair keyPair = kpg.generateKeyPair();//»ñÈ¡ÃÜÔ¿¶Ô
-        ECPublicKey publicKey = (ECPublicKey) keyPair.getPublic();//»ñÈ¡¹«Ô¿
-        ECPrivateKey privateKey = (ECPrivateKey) keyPair.getPrivate();//»ñÈ¡ÃÜÔ¿
-        keyMap.put("ECCPUBLICKEY", Base64.toBase64String(publicKey.getEncoded()));//½«ÃÜÔ¿×ª»»ÎªBase64StringµÄ×Ö·û´®¸ñÊ½²¢´æ´¢ÔÚMapÖĞ
-        keyMap.put("ECCPRIVATEKEY", Base64.toBase64String(privateKey.getEncoded()));//½«¹«Ô¿×ª»»ÎªBase64StringµÄ×Ö·û´®¸ñÊ½²¢´æ´¢ÔÚMapÖĞ
+        Security.insertProviderAt(new BouncyCastleProvider(), 1);//æ˜¾å¼æ·»åŠ å®‰å…¨æä¾›è€…
+        //Map<String,String>keyMap=new HashMap<String,String>();//å»ºç«‹ä¸€ä¸ªå›¾å­˜å‚¨å¯†é’¥å¯¹
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("ECIES", "BC");//æŒ‡æ˜å®‰å…¨æä¾›è€…
+        kpg.initialize(256);//è®¾ç½®å¯†é’¥é•¿åº¦ä¸º116ä½
+        KeyPair keyPair = kpg.generateKeyPair();//è·å–å¯†é’¥å¯¹
+        ECPublicKey publicKey = (ECPublicKey) keyPair.getPublic();//è·å–å…¬é’¥
+        ECPrivateKey privateKey = (ECPrivateKey) keyPair.getPrivate();//è·å–å¯†é’¥
+        keyMap.put("ECCPUBLICKEY", Base64.toBase64String(publicKey.getEncoded()));//å°†å¯†é’¥è½¬æ¢ä¸ºBase64Stringçš„å­—ç¬¦ä¸²æ ¼å¼å¹¶å­˜å‚¨åœ¨Mapä¸­
+        keyMap.put("ECCPRIVATEKEY", Base64.toBase64String(privateKey.getEncoded()));//å°†å…¬é’¥è½¬æ¢ä¸ºBase64Stringçš„å­—ç¬¦ä¸²æ ¼å¼å¹¶å­˜å‚¨åœ¨Mapä¸­
     }
 
-    //»ñÈ¡¹«Ô¿
+    //è·å–å…¬é’¥
     private static ECPublicKey getECCPublicKey() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
         String eccPublicKey = new String("ECCPUBLICKEY");
-        byte[] eccPublicKey2 = (Base64.decode(keyMap.get(eccPublicKey)));//½âÂë
-        X509EncodedKeySpec X509PublicKeyObject = new X509EncodedKeySpec(eccPublicKey2);//Éú³ÉX509EncodedKeySpec¸ñÊ½µÄÃÜÔ¿¹æ·¶
-        KeyFactory keyFactory = KeyFactory.getInstance("ECDH", "BC");//»ñÈ¡ÃÜÔ¿¹¤³§¶ÔÏó
-        ECPublicKey eccPublicKey3 = (ECPublicKey) keyFactory.generatePublic(X509PublicKeyObject);//Éú³É¹«Ô¿
+        byte[] eccPublicKey2 = (Base64.decode(keyMap.get(eccPublicKey)));//è§£ç 
+        X509EncodedKeySpec X509PublicKeyObject = new X509EncodedKeySpec(eccPublicKey2);//ç”ŸæˆX509EncodedKeySpecæ ¼å¼çš„å¯†é’¥è§„èŒƒ
+        KeyFactory keyFactory = KeyFactory.getInstance("ECDH", "BC");//è·å–å¯†é’¥å·¥å‚å¯¹è±¡
+        ECPublicKey eccPublicKey3 = (ECPublicKey) keyFactory.generatePublic(X509PublicKeyObject);//ç”Ÿæˆå…¬é’¥
         return eccPublicKey3;
     }
 
-    //»ñÈ¡Ë½Ô¿
+    //è·å–ç§é’¥
     private static ECPrivateKey getECCPrivateKey() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
         String eccPrivateKey = new String("ECCPRIVATEKEY");
-        byte[] eccPrivateKey2 = (Base64.decode(keyMap.get(eccPrivateKey)));//½âÂë
-        PKCS8EncodedKeySpec PKCS8PrivateKeyObject = new PKCS8EncodedKeySpec(eccPrivateKey2);//Éú³ÉPKCS8EncodedKeySpec¸ñÊ½µÄÃÜÔ¿¹æ·¶
-        KeyFactory keyFactory = KeyFactory.getInstance("ECDH", "BC");//»ñÈ¡ÃÜÔ¿¹¤³§¶ÔÏó
-        ECPrivateKey eccPrivateKey3 = (ECPrivateKey) keyFactory.generatePrivate(PKCS8PrivateKeyObject);//Éú³ÉË½Ô¿
+        byte[] eccPrivateKey2 = (Base64.decode(keyMap.get(eccPrivateKey)));//è§£ç 
+        PKCS8EncodedKeySpec PKCS8PrivateKeyObject = new PKCS8EncodedKeySpec(eccPrivateKey2);//ç”ŸæˆPKCS8EncodedKeySpecæ ¼å¼çš„å¯†é’¥è§„èŒƒ
+        KeyFactory keyFactory = KeyFactory.getInstance("ECDH", "BC");//è·å–å¯†é’¥å·¥å‚å¯¹è±¡
+        ECPrivateKey eccPrivateKey3 = (ECPrivateKey) keyFactory.generatePrivate(PKCS8PrivateKeyObject);//ç”Ÿæˆç§é’¥
         return eccPrivateKey3;
     }
 
-    //¼ÓÃÜ
+    //åŠ å¯†
     private static String encryption(byte[] text) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         ECPublicKey eccPublicKey = getECCPublicKey();
-        Cipher cipher = Cipher.getInstance("ECIES", "BC");//»ñÈ¡ÃÜÂëÒıÇæ¶ÔÏó
-        cipher.init(Cipher.ENCRYPT_MODE, eccPublicKey);//³õÊ¼»¯¼ÓÃÜÄ£Ê½ºÍ¹«Ô¿
-        byte[] cipherText = cipher.doFinal(text);//¼ÓÃÜ
+        Cipher cipher = Cipher.getInstance("ECIES", "BC");//è·å–å¯†ç å¼•æ“å¯¹è±¡
+        cipher.init(Cipher.ENCRYPT_MODE, eccPublicKey);//åˆå§‹åŒ–åŠ å¯†æ¨¡å¼å’Œå…¬é’¥
+        byte[] cipherText = cipher.doFinal(text);//åŠ å¯†
         String text3 = Base64.toBase64String(cipherText);
         return text3;
     }
 
-    //½âÃÜ
+    //è§£å¯†
     private static String decryption(String text) throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException, IOException {
         ECPrivateKey eccPrivateKey = getECCPrivateKey();
-        Cipher cipher = Cipher.getInstance("ECIES", "BC");//»ñÈ¡ÃÜÂëÒıÇæ¶ÔÏó
-        cipher.init(Cipher.DECRYPT_MODE, eccPrivateKey);//³õÊ¼»¯½âÃÜÄ£Ê½ºÍË½Ô¿
-        //¶ÔÃÜÎÄ½øĞĞBase64½âÂë
+        Cipher cipher = Cipher.getInstance("ECIES", "BC");//è·å–å¯†ç å¼•æ“å¯¹è±¡
+        cipher.init(Cipher.DECRYPT_MODE, eccPrivateKey);//åˆå§‹åŒ–è§£å¯†æ¨¡å¼å’Œç§é’¥
+        //å¯¹å¯†æ–‡è¿›è¡ŒBase64è§£ç 
         BASE64Decoder decoder = new BASE64Decoder();
         byte[] text3 = decoder.decodeBuffer(text);
 
-        byte[] text4 = cipher.doFinal(text3);//½âÃÜ
+        byte[] text4 = cipher.doFinal(text3);//è§£å¯†
         String text5 = Base64.toBase64String(text4);
         return text5;
     }
