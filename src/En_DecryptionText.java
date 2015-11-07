@@ -1,5 +1,7 @@
 /**
- * Created by lenovo on 2015/10/26.
+ * Package_name ${PACKAGE_NAME}
+ * Project_name Bouncycastle
+ * Created by hugo on 2015/10/26 22:48
  */
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
@@ -19,12 +21,14 @@ import java.security.KeyFactory;
 import java.util.HashMap;
 import java.security.KeyPairGenerator;
 
-
+//@该加密方法只能加密单个字符串
 public class En_DecryptionText {
     public static void main(String[] args) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, IOException
     {
+        //测试运行时间
+        long startTime=System.nanoTime();
         //测试文本
-        String text = new String("Hugo majors in SoftWare Engineering in South China University of Technology.");
+        String text = "Hugo";
         System.out.println("The text before being encrypted is : " + text);
         //密钥的生成
         setECCKey();
@@ -39,6 +43,9 @@ public class En_DecryptionText {
         //解密
         String textAfterDecrypted = decryption(textAfterEncrypted);
         System.out.println("The text after being encrypted is : " + textAfterDecrypted);
+
+        long endTime=System.nanoTime();
+        System.out.println(endTime-startTime);
     }
 
     //生成密钥（公钥和私钥），并保存在HashMap<String,String>keyMap中
@@ -58,22 +65,20 @@ public class En_DecryptionText {
 
     //获取公钥
     private static ECPublicKey getECCPublicKey() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
-        String eccPublicKey = new String("ECCPUBLICKEY");
+        String eccPublicKey = "ECCPUBLICKEY";
         byte[] eccPublicKey2 = (Base64.decode(keyMap.get(eccPublicKey)));//解码
         X509EncodedKeySpec X509PublicKeyObject = new X509EncodedKeySpec(eccPublicKey2);//生成X509EncodedKeySpec格式的密钥规范
         KeyFactory keyFactory = KeyFactory.getInstance("ECDH", "BC");//获取密钥工厂对象
-        ECPublicKey eccPublicKey3 = (ECPublicKey) keyFactory.generatePublic(X509PublicKeyObject);//生成公钥
-        return eccPublicKey3;
+        return (ECPublicKey) keyFactory.generatePublic(X509PublicKeyObject);
     }
 
     //获取私钥
     private static ECPrivateKey getECCPrivateKey() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
-        String eccPrivateKey = new String("ECCPRIVATEKEY");
+        String eccPrivateKey = "ECCPRIVATEKEY";
         byte[] eccPrivateKey2 = (Base64.decode(keyMap.get(eccPrivateKey)));//解码
         PKCS8EncodedKeySpec PKCS8PrivateKeyObject = new PKCS8EncodedKeySpec(eccPrivateKey2);//生成PKCS8EncodedKeySpec格式的密钥规范
         KeyFactory keyFactory = KeyFactory.getInstance("ECDH", "BC");//获取密钥工厂对象
-        ECPrivateKey eccPrivateKey3 = (ECPrivateKey) keyFactory.generatePrivate(PKCS8PrivateKeyObject);//生成私钥
-        return eccPrivateKey3;
+        return (ECPrivateKey) keyFactory.generatePrivate(PKCS8PrivateKeyObject);
     }
 
     //加密
@@ -82,8 +87,7 @@ public class En_DecryptionText {
         Cipher cipher = Cipher.getInstance("ECIES", "BC");//获取密码引擎对象
         cipher.init(Cipher.ENCRYPT_MODE, eccPublicKey);//初始化加密模式和公钥
         byte[] cipherText = cipher.doFinal(text);//加密
-        String text3 = Base64.toBase64String(cipherText);
-        return text3;
+        return Base64.toBase64String(cipherText);
     }
 
     //解密
@@ -96,8 +100,7 @@ public class En_DecryptionText {
         byte[] text3 = decoder.decodeBuffer(text);
 
         byte[] text4 = cipher.doFinal(text3);//解密
-        String text5 = Base64.toBase64String(text4);
-        return text5;
+        return Base64.toBase64String(text4);
     }
 
     public static HashMap<String, String> keyMap = new HashMap<String, String>();
