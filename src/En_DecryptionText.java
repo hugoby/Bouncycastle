@@ -52,6 +52,7 @@ public class En_DecryptionText {
         System.out.println(endTime-startTime);
     }
 
+
     //生成密钥（公钥和私钥），并保存在HashMap<String,String>keyMap中
     private static void setECCKey() throws NoSuchProviderException, NoSuchAlgorithmException
     {
