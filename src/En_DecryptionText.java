@@ -24,8 +24,7 @@ import java.security.KeyPairGenerator;
 
 //@该加密方法只能加密单个字符串
 public class En_DecryptionText {
-    public static void main(String[] args) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, IOException
-    {
+    public static void main(String[] args) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException, InvalidKeyException, InvalidKeySpecException, IOException, SignatureException {
         //测试运行时间
         long startTime=System.nanoTime();
         //测试文本
@@ -45,6 +44,10 @@ public class En_DecryptionText {
         String textAfterDecrypted = decryption(textAfterEncrypted);
         System.out.println("The text after being encrypted is : " + textAfterDecrypted);
 
+        String signature=setSignature(text);
+        System.out.println("The signature is: "+signature);
+        if(isRightSignature(textAfterDecrypted,signature))
+            System.out.println("The signature is right.");
         long endTime=System.nanoTime();
         System.out.println(endTime-startTime);
     }
@@ -97,20 +100,41 @@ public class En_DecryptionText {
         Cipher cipher = Cipher.getInstance("ECIES", "BC");//获取密码引擎对象
         cipher.init(Cipher.DECRYPT_MODE, eccPrivateKey);//初始化解密模式和私钥
         //对密文进行Base64解码
+
         BASE64Decoder decoder = new BASE64Decoder();
         byte[] text3 = decoder.decodeBuffer(text);
-
         byte[] text4 = cipher.doFinal(text3);//解密
         return Base64.toBase64String(text4);
     }
 
-    public static HashMap<String, String> keyMap = new HashMap<String, String>();
-
-
-    private static void signature(byte[] text) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, InvalidKeyException, SignatureException {
-        ECPrivateKey eccPpivateKey = getECCPrivateKey();
-        Signature signature = Signature.getInstance("ECIES", "BC");
-        signature.initSign(eccPpivateKey);
-        signature.update(text);
+    private static String setSignature(String text) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, InvalidKeyException, SignatureException
+    {
+        ECPrivateKey eccPrivateKey = getECCPrivateKey();
+        Signature signature = Signature.getInstance("ECDSA", "BC");
+        signature.initSign(eccPrivateKey);
+        byte[] text2=text.getBytes();
+        signature.update(text2);
+        byte[] sign=signature.sign();
+        return Base64.toBase64String(sign);
     }
+
+    private static boolean isRightSignature(String text,String sign) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, InvalidKeyException, SignatureException, IOException
+    {
+        ECPublicKey eccPublicKey=getECCPublicKey();
+        Signature signature=Signature.getInstance("ECDSA","BC");
+        signature.initVerify(eccPublicKey);
+        byte[] text2=text.getBytes();
+        signature.update(text2);
+        BASE64Decoder decoder=new BASE64Decoder();
+        byte[] sign2=decoder.decodeBuffer(sign);
+        return signature.verify(sign2);
+    }
+
+    public static HashMap<String, String> keyMap = new HashMap<String, String>();
 }
+
+
+
+
+
+
